@@ -2,6 +2,7 @@ import { Command } from "commander";
 import chalk from "chalk";
 import ora from "ora";
 import Table from "cli-table3";
+import { auditDependencies } from "../dependency-auditor/index.js";
 
 const depsCommand = new Command("deps")
   .description("Manage dependencies")
@@ -12,37 +13,59 @@ const depsCommand = new Command("deps")
       const spinner = ora("Checking dependencies for vulnerabilities...").start();
 
       try {
-        await new Promise((resolve) => setTimeout(resolve, 1500));
+        const result = await auditDependencies(process.cwd());
 
         spinner.succeed("Check complete!");
 
+        if (!result) {
+          console.log(chalk.yellow("\n⚠️  No package manager found (package.json or composer.json)\n"));
+          return;
+        }
+
+        if (result.totalVulnerabilities === 0) {
+          console.log(chalk.green("\n✅ No vulnerabilities found!\n"));
+          return;
+        }
+
         const table = new Table({
-          head: [chalk.cyan("Package"), chalk.cyan("Version"), chalk.cyan("Severity"), chalk.cyan("Fix")],
-          colWidths: [40, 15, 15, 20],
+          head: [chalk.cyan("Package"), chalk.cyan("Version"), chalk.cyan("Severity"), chalk.cyan("Advisory")],
+          colWidths: [40, 15, 15, 30],
         });
 
-        table.push(
-          [
-            "lodash",
-            "^4.17.21",
-            chalk.red("Critical"),
-            chalk.green("update to ^4.17.21"),
-          ],
-          [
-            "axios",
-            "^1.6.0",
-            chalk.yellow("Moderate"),
-            chalk.green("update to ^1.6.5"),
-          ],
-        );
+        for (const vuln of result.vulnerabilities) {
+          const severity = vuln.severity === "critical" ? chalk.red("Critical") :
+                          vuln.severity === "high" ? chalk.red("High") :
+                          vuln.severity === "moderate" ? chalk.yellow("Moderate") :
+                          chalk.green("Low");
+
+          table.push([
+            vuln.package,
+            vuln.version,
+            severity,
+            vuln.title.substring(0, 28),
+          ]);
+        }
 
         console.log(table.toString());
-        console.log(
-          chalk.gray(`\n${chalk.red.bold("2")} vulnerable packages found`),
-        );
-      } catch (error) {
+
+        const summary = [];
+        if (result.critical > 0) summary.push(`${chalk.red.bold(result.critical)} critical`);
+        if (result.high > 0) summary.push(`${chalk.red(result.high)} high`);
+        if (result.moderate > 0) summary.push(`${chalk.yellow(result.moderate)} moderate`);
+        if (result.low > 0) summary.push(`${chalk.green(result.low)} low`);
+
+        console.log(chalk.gray(`\n📦 ${result.tool} • ${result.totalVulnerabilities} vulnerabilities found:`));
+        console.log(chalk.white(`   ${summary.join(", ")}\n`));
+        console.log(chalk.gray("Fix with:") + chalk.white(`   ${result.tool === "npm" ? "npm audit fix" : "composer update"}\n`));
+      } catch (error: any) {
         spinner.fail("Failed to check dependencies");
-        console.error(error);
+        if (error.message.includes("command not found")) {
+          console.log(chalk.yellow("\n⚠️  Package manager not installed\n"));
+          console.log(chalk.white("For Node.js: npm install -g npm"));
+          console.log(chalk.white("For PHP: composer\n"));
+        } else {
+          console.error(error);
+        }
         process.exit(1);
       }
     }),
@@ -61,15 +84,23 @@ const depsCommand = new Command("deps")
         const spinner = ora("Updating dependencies...").start();
 
         try {
-          await new Promise((resolve) => setTimeout(resolve, 2000));
+          const result = await auditDependencies(process.cwd());
+
+          if (!result) {
+            spinner.warn("No package manager found");
+            console.log(chalk.yellow("\nNo package.json or composer.json found\n"));
+            return;
+          }
+
+          if (result?.tool === "npm") {
+            const { execSync } = await import("child_process");
+            execSync("npm update", { cwd: process.cwd(), stdio: "inherit" });
+          } else if (result?.tool === "composer") {
+            const { execSync } = await import("child_process");
+            execSync("composer update", { cwd: process.cwd(), stdio: "inherit" });
+          }
 
           spinner.succeed("Dependencies updated!");
-
-          console.log(chalk.green("\n✅ Updated 8 packages:\n"));
-          console.log(chalk.white("  • axios: 1.6.0 → 1.7.0"));
-          console.log(chalk.white("  • react: 18.2.0 → 18.3.1"));
-          console.log(chalk.white("  • typescript: 5.6.0 → 5.7.0"));
-          console.log(chalk.gray("  (and 5 more minor updates)\n"));
         } catch (error) {
           spinner.fail("Failed to update dependencies");
           console.error(error);
