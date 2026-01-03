@@ -1,0 +1,273 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary: #10B981;
+    --primary-dark: #059669;
+    --secondary: #1F2937;
+    --text: #111827;
+    --text-light: #6B7280;
+    --bg: #F9FAFB;
+    --white: #FFFFFF;
+    --border: #E5E7EB;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+}
+
+header {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+nav {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: var(--primary);
+}
+
+.logo img {
+    width: 40px;
+    height: 40px;
+}
+
+.nav-links {
+    display: flex;
+    gap: 2rem;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: var(--text-light);
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.nav-link:hover {
+    color: var(--primary);
+}
+
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.hero {
+    padding: 8rem 0;
+    text-align: center;
+}
+
+.hero-content h1 {
+    font-size: 3.5rem;
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 1rem;
+    color: var(--secondary);
+}
+
+.hero-content h1 span {
+    color: var(--primary);
+}
+
+.hero-content > p {
+    font-size: 1.25rem;
+    color: var(--text-light);
+    margin-bottom: 2rem;
+}
+
+.cta-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.cta {
+    display: inline-block;
+    padding: 0.875rem 2rem;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.cta.primary {
+    background: var(--primary);
+    color: var(--white);
+}
+
+.cta.primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.cta.secondary {
+    background: var(--white);
+    color: var(--secondary);
+    border: 2px solid var(--border);
+}
+
+.cta.secondary:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+section {
+    padding: 4rem 0;
+}
+
+section > h2 {
+    text-align: center;
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 3rem;
+    color: var(--secondary);
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+}
+
+.feature-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.feature-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.feature-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.feature-card h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    color: var(--secondary);
+}
+
+.feature-card p {
+    color: var(--text-light);
+}
+
+.code-block {
+    background: var(--secondary);
+    border-radius: 12px;
+    padding: 2rem;
+    overflow-x: auto;
+}
+
+.code-block pre {
+    margin: 0;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 0.95rem;
+    line-height: 1.8;
+}
+
+.code-block code {
+    color: var(--white);
+}
+
+.code-block .comment {
+    color: #6B7280;
+}
+
+.ecosystem-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.ecosystem-link {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-decoration: none;
+    transition: transform 0.2s, box-shadow 0.2s;
+    text-align: center;
+}
+
+.ecosystem-link:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.ecosystem-link.current {
+    border-color: var(--primary);
+    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.1);
+}
+
+.ecosystem-icon {
+    font-size: 2rem;
+    margin-bottom: 0.75rem;
+}
+
+.ecosystem-name {
+    font-weight: 600;
+    color: var(--secondary);
+    margin-bottom: 0.5rem;
+}
+
+.ecosystem-desc {
+    font-size: 0.875rem;
+    color: var(--text-light);
+}
+
+footer {
+    background: var(--white);
+    border-top: 1px solid var(--border);
+    padding: 2rem;
+    text-align: center;
+    color: var(--text-light);
+}
+
+@media (max-width: 768px) {
+    .hero-content h1 {
+        font-size: 2.5rem;
+    }
+
+    .nav-links {
+        gap: 1rem;
+    }
+
+    .cta-buttons {
+        flex-direction: column;
+    }
+
+    .features-grid,
+    .ecosystem-grid {
+        grid-template-columns: 1fr;
+    }
+}

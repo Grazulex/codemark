@@ -1,0 +1,66 @@
+{
+  "name": "@grazulex/codemark",
+  "version": "0.1.0",
+  "description": "Code quality and standards management CLI tool",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "codemark": "./dist/index.js"
+  },
+  "files": ["dist", "README.md", "LICENSE", "CHANGELOG.md"],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Grazulex/codemark.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Grazulex/codemark/issues"
+  },
+  "homepage": "https://github.com/Grazulex/codemark#readme",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/index.js",
+    "link": "npm run build && npm link",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "test:coverage": "vitest --coverage",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "format": "biome format --write .",
+    "check": "biome check . && tsc --noEmit",
+    "prepublishOnly": "npm run check && npm run build"
+  },
+  "keywords": [
+    "code-quality",
+    "linting",
+    "cli",
+    "standards",
+    "eslint",
+    "prettier",
+    "developer-tools"
+  ],
+  "author": "Jean-Marc Strauven",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "commander": "^12.1.0",
+    "inquirer": "^12.2.0",
+    "ora": "^8.1.1",
+    "boxen": "^8.0.1",
+    "cli-table3": "^0.6.5",
+    "chokidar": "^4.0.1",
+    "glob": "^11.0.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@types/inquirer": "^9.0.7",
+    "@types/node": "^22.10.2",
+    "@vitest/coverage-v8": "^4.0.7",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^4.0.7"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
