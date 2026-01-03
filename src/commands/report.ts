@@ -5,6 +5,7 @@ import Table from "cli-table3";
 import { existsSync, readdirSync, readFileSync } from "fs";
 import { join } from "path";
 import { analyzeComplexity, getComplexityLevel } from "../analyzers/index.js";
+import { getCoverageReport, getCoverageLevel } from "../coverage/index.js";
 
 export const reportCommand = new Command("report")
   .description("Generate code quality report")
@@ -18,6 +19,9 @@ export const reportCommand = new Command("report")
     try {
       // Analyze complexity
       const complexities = await analyzeProject();
+
+      // Get coverage
+      const coverage = await getCoverageReport(process.cwd());
 
       const avgComplexity =
         complexities.length > 0
@@ -44,17 +48,40 @@ export const reportCommand = new Command("report")
       const complexityLevel = getComplexityLevel(avgComplexity);
       const { status: maintainabilityStatus, score } = getMaintainabilityStatus(avgMaintainability);
 
+      // Coverage metric
+      const coveragePercentage = coverage ? coverage.percentage : 0;
+      const coverageLevel = getCoverageLevel(coveragePercentage);
+
       table.push(
         ["Files Analyzed", complexities.length.toString(), chalk.cyan("✓")],
         ["Total Functions", complexities.reduce((sum, c) => sum + c.functions.length, 0).toString(), chalk.cyan("✓")],
-        ["Avg Cyclomatic Complexity", avgComplexity.toFixed(1), complexityLevel.level.toUpperCase()],
+        ["Cyclomatic Complexity", `${avgComplexity.toFixed(1)}`, complexityLevel.level.toUpperCase()],
         ["Max Complexity", maxComplexity.toString(), maxComplexity > 10 ? chalk.red("High") : chalk.green("Low")],
         ["Maintainability Index", `${score}/100`, maintainabilityStatus],
-        ["Technical Debt Ratio", "5%", chalk.yellow("⚠ Moderate")],
-        ["Code Coverage", "87%", chalk.green("✓ Good")],
+        ["Code Coverage", `${coveragePercentage}%`, `${coverageLevel.emoji} ${coverageLevel.level}`],
       );
 
       console.log(table.toString());
+
+      // Show low coverage files if coverage available
+      if (coverage && coverage.files.length > 0) {
+        const lowCoverageFiles = coverage.files
+          .filter((f) => f.percentage < 80)
+          .sort((a, b) => a.percentage - b.percentage)
+          .slice(0, 5);
+
+        if (lowCoverageFiles.length > 0) {
+          console.log(chalk.yellow.bold("\n⚠️  Low Coverage Files (<80%):\n"));
+          for (const file of lowCoverageFiles) {
+            const path = file.path.replace(process.cwd(), "");
+            const level = getCoverageLevel(file.percentage);
+            console.log(chalk.white(`  ${path}`));
+            console.log(chalk.gray(`    Coverage: ${level.emoji} ${file.percentage}%`));
+          }
+          console.log("");
+        }
+      }
+
       console.log(chalk.gray("\n📈 Overall Quality Score: " + chalk.green.bold("A (87/100)\n")));
 
       // Show complex functions
