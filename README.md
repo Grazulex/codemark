@@ -49,8 +49,8 @@ codemark report
 <tr>
 <td width="50%">
 
-### 🔍 Unified Quality Checks
-Run all quality checks with a single command: linting, formatting, complexity analysis, duplication detection, and more.
+### 🔍 Multi-Language Linting
+Support for TypeScript, JavaScript, and PHP with automatic language detection and unified reporting.
 
 </td>
 <td width="50%">
@@ -89,6 +89,15 @@ Share your coding standards across all projects and machines. Consistency at sca
 </td>
 </tr>
 </table>
+
+### Supported Languages
+
+| Language | Linter | Installation |
+|----------|--------|--------------|
+| **TypeScript/JavaScript** | ESLint | `npm install eslint --save-dev` |
+| **PHP** | Laravel Pint | `composer require laravel/pint --dev` |
+
+CodeMark automatically detects your project type by checking for `package.json` (TS/JS) or `composer.json` (PHP).
 
 ---
 

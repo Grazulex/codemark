@@ -1,0 +1,15 @@
+project: codemark
+language: typescript
+standards:
+  - line-length
+  - semicolons
+  - indentation
+autoFix: true
+patterns:
+  include:
+    - "*.ts"
+    - "*.js"
+  exclude:
+    - node_modules
+    - dist
+    - vendor

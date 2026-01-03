@@ -3,6 +3,7 @@ import chalk from "chalk";
 import ora from "ora";
 import { existsSync, readFileSync } from "fs";
 import { join } from "path";
+import { runLinters, detectLanguages } from "../linters/index.js";
 
 export const checkCommand = new Command("check")
   .description("Run all code quality checks")
@@ -18,23 +19,58 @@ export const checkCommand = new Command("check")
       process.exit(1);
     }
 
+    const languages = detectLanguages(process.cwd());
     const spinner = ora("Running code quality checks...").start();
 
     try {
-      // This is a placeholder - actual implementation will run real checks
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      spinner.text = `Linting with ${languages.join(", ")}...`;
 
-      spinner.text = "Analyzing code...";
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const results = await runLinters(process.cwd(), languages);
+
+      if (results.length === 0) {
+        spinner.warn("No linters available");
+        console.log(chalk.yellow("\n⚠️  No linters found or installed.\n"));
+        console.log(chalk.white("For TypeScript/JavaScript: ensure ESLint is installed"));
+        console.log(chalk.white("For PHP: ensure Laravel Pint is installed (composer require laravel/pint --dev)\n"));
+        return;
+      }
 
       spinner.succeed("Checks completed!");
 
-      console.log(chalk.green("\n✅ All checks passed!\n"));
+      let totalErrors = 0;
+      let totalWarnings = 0;
+      let filesWithIssues = 0;
 
-      console.log(chalk.gray("Results:"));
-      console.log(chalk.white("  Files analyzed: 25"));
-      console.log(chalk.white("  Issues found: 0"));
-      console.log(chalk.white("  Security vulnerabilities: 0"));
+      for (const result of results) {
+        totalErrors += result.totalErrors;
+        totalWarnings += result.totalWarnings;
+        filesWithIssues += result.files.filter((f) => f.errors.length > 0 || f.warnings.length > 0).length;
+
+        console.log(chalk.yellow(`\n📦 ${result.tool}\n`));
+
+        for (const file of result.files) {
+          if (file.errors.length > 0 || file.warnings.length > 0) {
+            const relPath = file.path.replace(process.cwd(), "");
+            console.log(chalk.white(`  ${relPath}`));
+
+            for (const error of [...file.errors, ...file.warnings]) {
+              const severity = error.severity === "error" ? chalk.red("✗") : chalk.yellow("⚠");
+              const location = error.line ? `:${error.line}` : "";
+              console.log(`    ${severity} ${error.message}${location} [${error.rule}]`);
+            }
+          }
+        }
+      }
+
+      console.log(chalk.gray("\n─────────────────────────────────────"));
+      console.log(chalk.white(`  Files analyzed: ${results.reduce((acc, r) => acc + r.files.length, 0)}`));
+      console.log(chalk.red(`  Errors: ${totalErrors}`));
+      console.log(chalk.yellow(`  Warnings: ${totalWarnings}`));
+      console.log(chalk.white(`\n✅ Checks completed!\n`));
+
+      if (totalErrors > 0) {
+        process.exit(1);
+      }
     } catch (error) {
       spinner.fail("Checks failed");
       console.error(error);

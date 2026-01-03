@@ -7,7 +7,12 @@
   "bin": {
     "codemark": "./dist/index.js"
   },
-  "files": ["dist", "README.md", "LICENSE", "CHANGELOG.md"],
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Grazulex/codemark.git"
@@ -42,22 +47,26 @@
   "author": "Jean-Marc Strauven",
   "license": "MIT",
   "dependencies": {
-    "chalk": "^5.3.0",
-    "commander": "^12.1.0",
-    "inquirer": "^12.2.0",
-    "ora": "^8.1.1",
     "boxen": "^8.0.1",
-    "cli-table3": "^0.6.5",
+    "chalk": "^5.3.0",
     "chokidar": "^4.0.1",
-    "glob": "^11.0.0"
+    "cli-table3": "^0.6.5",
+    "commander": "^12.1.0",
+    "glob": "^11.0.0",
+    "inquirer": "^12.2.0",
+    "ora": "^8.1.1"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
+    "@eslint/js": "^9.39.2",
     "@types/inquirer": "^9.0.7",
     "@types/node": "^22.10.2",
+    "@typescript-eslint/eslint-plugin": "^8.51.0",
+    "@typescript-eslint/parser": "^8.51.0",
     "@vitest/coverage-v8": "^4.0.7",
+    "eslint": "^9.39.2",
     "tsx": "^4.19.2",
-    "typescript": "^5.7.2",
+    "typescript": "^5.9.3",
     "vitest": "^4.0.7"
   },
   "engines": {
